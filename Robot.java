@@ -18,7 +18,7 @@ public class Robot {
     private List<Memory<?>> memory = new ArrayList<>();
     private List<Sensor<?>> sensors = new ArrayList<>();
     private Queue<Command> todo = new ArrayDeque<>();
-    private Function<Robot, List<Command>> program;        //TODO ? = new Program .mit OVerride....???
+    private Function<Robot, List<Command>> program; //TODO implement?
 
     /// Methods
     public Robot(String name, double direction, double size) {
@@ -31,6 +31,24 @@ public class Robot {
         this.program = newProgram;
     }
 
+    public void work() {
+        if (todo.isEmpty()) {
+            this.sense();
+            this.think();
+        }
+        this.act();
+    }
+
+    private void sense() {
+        for (Sensor<?> sens : sensors) {
+            fooSensor(sens);
+        }
+    }
+    /* Hilfsmethode */
+    private <T> void fooSensor(Sensor<T> sensor) {
+        sensor.processor.accept(sensor.getData());
+    }
+
     private void think() {
         List<Command> newCommands = program.apply(this);
         todo.addAll(newCommands);
@@ -41,21 +59,6 @@ public class Robot {
             if (!todo.remove().execute(this)) {
                 break;
             }
-        }
-    }
-
-    public void work() {
-        if (todo.isEmpty()) {
-            this.sense();
-            this.think();
-        }
-        this.act();
-    }
-
-
-    private void sense() {
-        for (Sensor<?> sens : sensors) {
-            //TODO  sens.processor.accept();
         }
     }
 
@@ -72,7 +75,7 @@ public class Robot {
     public String memoryToString() {
         StringBuilder sB = new StringBuilder();
         for (Memory<?> mem : memory) {
-            sB.append("[").append(mem.toString()).append("]");
+            sB.append("[").append(mem.toString()).append("]"); //TODO: check if < > also needed!
         }
         return sB.toString();
     }
